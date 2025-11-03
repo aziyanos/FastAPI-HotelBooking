@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, validator
 from typing import Optional, List
 from app.db.models import RoomStatus, BookingStatus, RoomType, RoleChoices
 from datetime import datetime, date
@@ -44,6 +44,14 @@ class UserProfileSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class UserProfileLoginSchema(BaseModel):
+    user_name: str
+    password: str
+
+
 
 
 class CityBase(BaseModel):
