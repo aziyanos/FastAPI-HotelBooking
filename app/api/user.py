@@ -18,15 +18,6 @@ async def get_db():
 user_router = APIRouter(prefix='/user', tags=['UserProfile'])
 
 
-@user_router.post('/', response_model=UserProfileSchema)
-async def create_user(user_data: UserProfileSchema, db: Session = Depends(get_db)):
-    user_db =UserProfile(**user_data.dict())
-    db.add(user_db)
-    db.commit()
-    db.refresh(user_db)
-    return user_db
-
-
 @user_router.get('/', response_model=List[UserProfileSchema])
 async def list_user(db: Session = Depends(get_db)):
 
