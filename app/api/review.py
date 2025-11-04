@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.models import Review
-from app.db.schemas import ReviewSchema
+from app.db.schemas import ReviewOutSchema, ReviewCreateSchema, ReviewUpdateSchema
 from app.db.database import SessionLocal
 
 review_router = APIRouter(prefix="/review", tags=["Review"])
@@ -16,8 +16,8 @@ async def get_db():
         db.close()
 
 
-@review_router.post("/", response_model=ReviewSchema)
-async def create_review(review_data: ReviewSchema, db: Session = Depends(get_db)):
+@review_router.post("/", response_model=ReviewOutSchema)
+async def create_review(review_data: ReviewCreateSchema, db: Session = Depends(get_db)):
     new_review = Review(**review_data.dict())
 
     db.add(new_review)
@@ -26,12 +26,12 @@ async def create_review(review_data: ReviewSchema, db: Session = Depends(get_db)
     return new_review
 
 
-@review_router.get("/", response_model=List[ReviewSchema])
+@review_router.get("/", response_model=List[ReviewOutSchema])
 async def list_reviews(db: Session = Depends(get_db)):
     return db.query(Review).all()
 
 
-@review_router.get("/{review_id}/", response_model=ReviewSchema)
+@review_router.get("/{review_id}/", response_model=ReviewOutSchema)
 async def detail_review(review_id: int, db: Session = Depends(get_db)):
     review_db = db.query(Review).filter(Review.id == review_id).first()
     if not review_db:
@@ -39,8 +39,8 @@ async def detail_review(review_id: int, db: Session = Depends(get_db)):
     return review_db
 
 
-@review_router.put("/{review_id}/", response_model=ReviewSchema)
-async def update_review(review_data: ReviewSchema, review_id: int, db: Session = Depends(get_db)):
+@review_router.put("/{review_id}/", response_model=ReviewOutSchema)
+async def update_review(review_data: ReviewUpdateSchema, review_id: int, db: Session = Depends(get_db)):
     review_db = db.query(Review).filter(Review.id == review_id).first()
     if not review_db:
         raise HTTPException(status_code=404, detail="Review not found")
