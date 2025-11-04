@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.models import FavouriteItem
-from app.db.schemas import FavouriteItemSchema
+from app.db.schemas import (FavouriteItemOutSchema, FavouriteItemCreateSchema,
+                            FavouriteItemUpdateSchema, FavouriteItemDetailSchema)
+
 from app.db.database import SessionLocal
 
 favouriteitem_router = APIRouter(prefix="/favouriteitem", tags=["FavouriteItem"])
@@ -16,8 +18,8 @@ async def get_db():
         db.close()
 
 
-@favouriteitem_router.post("/", response_model=FavouriteItemSchema)
-async def create_favourite_item(favourite_item_data: FavouriteItemSchema, db: Session = Depends(get_db)):
+@favouriteitem_router.post("/", response_model=FavouriteItemOutSchema)
+async def create_favourite_item(favourite_item_data: FavouriteItemCreateSchema, db: Session = Depends(get_db)):
     new_favourite_item = FavouriteItem(
         favourite_id=favourite_item_data.favourite_id,
         hotel_id=favourite_item_data.hotel_id
@@ -29,13 +31,13 @@ async def create_favourite_item(favourite_item_data: FavouriteItemSchema, db: Se
 
 
 
-@favouriteitem_router.get("/", response_model=List[FavouriteItemSchema])
+@favouriteitem_router.get("/", response_model=List[FavouriteItemOutSchema])
 async def list_favourite_item(db: Session = Depends(get_db)):
     return db.query(FavouriteItem).all()
 
 
 
-@favouriteitem_router.get("/{favouriteitem_id}/", response_model=FavouriteItemSchema)
+@favouriteitem_router.get("/{favouriteitem_id}/", response_model=FavouriteItemDetailSchema)
 async def detail_favourite_item(favouriteitem_id: int, db: Session = Depends(get_db)):
     favourite_item_db = db.query(FavouriteItem).filter(FavouriteItem.id == favouriteitem_id).first()
     if not favourite_item_db:
@@ -44,8 +46,8 @@ async def detail_favourite_item(favouriteitem_id: int, db: Session = Depends(get
 
 
 
-@favouriteitem_router.put("/{favouriteitem_id}/", response_model=FavouriteItemSchema)
-async def update_favourite_item(favourite_item_data: FavouriteItemSchema, favouriteitem_id: int,
+@favouriteitem_router.put("/{favouriteitem_id}/", response_model=FavouriteItemOutSchema)
+async def update_favourite_item(favourite_item_data: FavouriteItemUpdateSchema, favouriteitem_id: int,
                                 db: Session = Depends(get_db)):
     favourite_item_db = db.query(FavouriteItem).filter(FavouriteItem.id == favouriteitem_id).first()
     if not favourite_item_db:
