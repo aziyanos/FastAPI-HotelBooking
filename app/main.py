@@ -1,5 +1,4 @@
 import uvicorn
-from datetime import datetime
 from fastapi import FastAPI, HTTPException, Depends, APIRouter
 
 from app.api.soical_auth import social_router
@@ -47,6 +46,20 @@ booking.include_router(health_status.health_routers)
 booking.add_middleware(SessionMiddleware, secret_key="SECRET_KEY")
 booking.add_middleware(LoggingMiddleware)
 
+
+@booking.get("/", response_class=HTMLResponse)
+async def home():
+    return """
+    <html>
+        <head>
+            <title>Booking</title>
+        </head>
+        <body>
+            <h1>Salam Aleikum</h1>
+            <p>Документация: <a href="/docs">Swagger</a></p>
+        </body>
+    </html>
+    """
 
 
 if __name__ == '__main__':
