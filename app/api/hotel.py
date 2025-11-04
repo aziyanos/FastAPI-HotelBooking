@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.models import Hotel
-from app.db.schemas import HotelSchema
+from app.db.schemas import (HotelOutSchema, HotelCreateSchema,
+                        HotelUpdateSchema, HotelDetailSchema)
+
 from app.db.database import SessionLocal
 
 hotel_router = APIRouter(prefix="/hotel", tags=["Hotel"])
@@ -16,8 +18,8 @@ async def get_db():
         db.close()
 
 
-@hotel_router.post("/", response_model=HotelSchema)
-async def create_hotel(hotel_data: HotelSchema, db: Session = Depends(get_db)):
+@hotel_router.post("/", response_model=HotelOutSchema)
+async def create_hotel(hotel_data: HotelCreateSchema, db: Session = Depends(get_db)):
     new_hotel = Hotel(**hotel_data.dict())
 
     db.add(new_hotel)
@@ -26,13 +28,13 @@ async def create_hotel(hotel_data: HotelSchema, db: Session = Depends(get_db)):
     return new_hotel
 
 
-@hotel_router.get("/", response_model=List[HotelSchema])
+@hotel_router.get("/", response_model=List[HotelOutSchema])
 async def list_hotel(db: Session = Depends(get_db)):
     return db.query(Hotel).all()
 
 
 
-@hotel_router.get("/{hotel_id}/", response_model=HotelSchema)
+@hotel_router.get("/{hotel_id}/", response_model=HotelDetailSchema)
 async def detail_hotel(hotel_id: int, db: Session = Depends(get_db)):
     hotel_db = db.query(Hotel).filter(Hotel.id == hotel_id).first()
     if not hotel_db:
@@ -40,8 +42,8 @@ async def detail_hotel(hotel_id: int, db: Session = Depends(get_db)):
     return hotel_db
 
 
-@hotel_router.put("/{hotel_id}/", response_model=HotelSchema)
-async def update_hotel(hotel_data: HotelSchema, hotel_id: int, db: Session = Depends(get_db)):
+@hotel_router.put("/{hotel_id}/", response_model=HotelOutSchema)
+async def update_hotel(hotel_data: HotelUpdateSchema, hotel_id: int, db: Session = Depends(get_db)):
     hotel_db = db.query(Hotel).filter(Hotel.id == hotel_id).first()
     if not hotel_db:
         raise HTTPException(status_code=404, detail="Hotel not found")

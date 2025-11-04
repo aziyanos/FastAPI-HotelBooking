@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Depends, APIRouter
 from app.db.models import UserProfile
-from app.db.schemas import UserProfileSchema
+from app.db.schemas import UserProfileSchema, UserProfileUpdateSchema
 from app.db.database import SessionLocal
 from sqlalchemy.orm import Session
 from typing import List
@@ -12,7 +12,6 @@ async def get_db():
         yield db
     finally:
         db.close()
-
 
 
 user_router = APIRouter(prefix='/user', tags=['UserProfile'])
@@ -33,7 +32,7 @@ async def detail_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @user_router.put('/{user_id}/', response_model=UserProfileSchema)
-async def update_user(user_data: UserProfileSchema, user_id: int, db: Session=Depends(get_db)):
+async def update_user(user_data: UserProfileUpdateSchema, user_id: int, db: Session=Depends(get_db)):
     user_db = db.query(UserProfile).filter(UserProfile.id == user_id).first()
 
     if user_db is None:
@@ -41,7 +40,6 @@ async def update_user(user_data: UserProfileSchema, user_id: int, db: Session=De
 
     for user_key, user_value in user_data.dict().items():
         setattr(user_db, user_key, user_value)
-
 
     db.add(user_db)
     db.commit()

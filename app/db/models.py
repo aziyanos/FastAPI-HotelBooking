@@ -50,7 +50,7 @@ class Country(Base):
     country_name: Mapped[String] = mapped_column(String(16), unique=True, index=True )
     country_image: Mapped[String] = mapped_column(String, nullable=True)
 
-    countries: Mapped[List['Hotel']] =relationship('Hotel', back_populates='country')
+    hotels: Mapped[List['Hotel']] =relationship('Hotel', back_populates='country')
 
 
 class UserProfile(Base):
@@ -90,7 +90,7 @@ class City(Base):
     city_name: Mapped[String] = mapped_column(String(16), index=True)
     city_image: Mapped[String] = mapped_column(String, nullable=True)
 
-    cities: Mapped[List['Hotel']] = relationship('Hotel', back_populates='city')
+    hotels: Mapped[List['Hotel']] = relationship('Hotel', back_populates='city')
 
 
 
@@ -117,10 +117,10 @@ class Hotel(Base):
     description: Mapped[str] = mapped_column(Text)
 
     country_id: Mapped[int] = mapped_column(ForeignKey('country.id'))
-    country: Mapped[Country] = relationship('Country', back_populates='countries')
+    country: Mapped[Country] = relationship('Country', back_populates='hotels')
 
     city_id: Mapped[int] = mapped_column(ForeignKey('city.id'))
-    city: Mapped[City] = relationship('City', back_populates='cities')
+    city: Mapped[City] = relationship('City', back_populates='hotels')
 
     owner_id: Mapped[int] = mapped_column(ForeignKey('userprofile.id'))
     owner: Mapped[UserProfile] = relationship('UserProfile', back_populates='owners')
