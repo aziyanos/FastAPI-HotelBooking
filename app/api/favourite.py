@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.models import Favourite
-from app.db.schemas import FavouriteSchema
+from app.db.schemas import FavouriteOutSchema, FavouriteCreateSchema, FavouriteDetailSchema, FavouriteUpdateSchema
 from app.db.database import SessionLocal
 
 favourite_router = APIRouter(prefix="/favourite", tags=["Favourite"])
@@ -17,8 +17,8 @@ async def get_db():
 
 
 
-@favourite_router.post("/", response_model=FavouriteSchema)
-async def create_favourite(favourite_data: FavouriteSchema, db: Session = Depends(get_db)):
+@favourite_router.post("/", response_model=FavouriteOutSchema)
+async def create_favourite(favourite_data: FavouriteCreateSchema, db: Session = Depends(get_db)):
     new_favourite = Favourite(user_id=favourite_data.user_id)
     db.add(new_favourite)
     db.commit()
@@ -26,12 +26,12 @@ async def create_favourite(favourite_data: FavouriteSchema, db: Session = Depend
     return new_favourite
 
 
-@favourite_router.get("/", response_model=List[FavouriteSchema])
+@favourite_router.get("/", response_model=List[FavouriteOutSchema])
 async def list_favourites(db: Session = Depends(get_db)):
     return db.query(Favourite).all()
 
 
-@favourite_router.get("/{favourite_id}/", response_model=FavouriteSchema)
+@favourite_router.get("/{favourite_id}/", response_model=FavouriteCreateSchema)
 async def detail_favourite(favourite_id: int, db: Session = Depends(get_db)):
     favourite_db = db.query(Favourite).filter(Favourite.id == favourite_id).first()
     if not favourite_db:
@@ -40,8 +40,8 @@ async def detail_favourite(favourite_id: int, db: Session = Depends(get_db)):
 
 
 
-@favourite_router.put("/{favourite_id}/", response_model=FavouriteSchema)
-async def update_favourite(favourite_data: FavouriteSchema, favourite_id: int, db: Session = Depends(get_db)):
+@favourite_router.put("/{favourite_id}/", response_model=FavouriteOutSchema)
+async def update_favourite(favourite_data: FavouriteUpdateSchema, favourite_id: int, db: Session = Depends(get_db)):
     favourite_db = db.query(Favourite).filter(Favourite.id == favourite_id).first()
     if not favourite_db:
         raise HTTPException(status_code=404, detail="Favourite not found")
