@@ -144,6 +144,7 @@ class Hotel(Base):
                                                                    cascade='all, delete-orphan')
 
 
+
 class HotelImage(Base):
     __tablename__ ='hotel_image'
 
