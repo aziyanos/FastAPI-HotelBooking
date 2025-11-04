@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.models import Booking
-from app.db.schemas import BookingSchema
+from app.db.schemas import (BookingOutSchema , BookingCreateSchema,
+                            BookingUpdateSchema, BookingDetailSchema)
 from app.db.database import SessionLocal
 
 
@@ -18,8 +19,8 @@ async def get_db():
         db.close()
 
 
-@booking_router.post("/", response_model=BookingSchema)
-async def create_booking(booking_data: BookingSchema, db: Session = Depends(get_db)):
+@booking_router.post("/", response_model=BookingOutSchema)
+async def create_booking(booking_data: BookingCreateSchema, db: Session = Depends(get_db)):
     new_booking = Booking(**booking_data.dict())
 
     db.add(new_booking)
@@ -28,12 +29,12 @@ async def create_booking(booking_data: BookingSchema, db: Session = Depends(get_
     return new_booking
 
 
-@booking_router.get("/", response_model=List[BookingSchema])
+@booking_router.get("/", response_model=List[BookingOutSchema])
 async def list_booking(db: Session = Depends(get_db)):
     return db.query(Booking).all()
 
 
-@booking_router.get("/{booking_id}/", response_model=BookingSchema)
+@booking_router.get("/{booking_id}/", response_model=BookingDetailSchema)
 async def detail_booking(booking_id: int, db: Session = Depends(get_db)):
     booking_db = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking_db:
@@ -41,8 +42,8 @@ async def detail_booking(booking_id: int, db: Session = Depends(get_db)):
     return booking_db
 
 
-@booking_router.put("/{booking_id}/", response_model=BookingSchema)
-async def update_booking(booking_data: BookingSchema, booking_id: int, db: Session = Depends(get_db)):
+@booking_router.put("/{booking_id}/", response_model=BookingOutSchema)
+async def update_booking(booking_data: BookingDetailSchema, booking_id: int, db: Session = Depends(get_db)):
     booking_db = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking_db:
         raise HTTPException(status_code=404, detail="Booking not found")
