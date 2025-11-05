@@ -4,8 +4,8 @@ from typing import List
 from app.db.models import FavouriteItem
 from app.db.schemas import (FavouriteItemOutSchema, FavouriteItemCreateSchema,
                             FavouriteItemUpdateSchema, FavouriteItemDetailSchema)
-
 from app.db.database import SessionLocal
+
 
 favouriteitem_router = APIRouter(prefix="/favouriteitem", tags=["FavouriteItem"])
 
@@ -30,11 +30,9 @@ async def create_favourite_item(favourite_item_data: FavouriteItemCreateSchema, 
     return new_favourite_item
 
 
-
 @favouriteitem_router.get("/", response_model=List[FavouriteItemOutSchema])
 async def list_favourite_item(db: Session = Depends(get_db)):
     return db.query(FavouriteItem).all()
-
 
 
 @favouriteitem_router.get("/{favouriteitem_id}/", response_model=FavouriteItemDetailSchema)
@@ -43,7 +41,6 @@ async def detail_favourite_item(favouriteitem_id: int, db: Session = Depends(get
     if not favourite_item_db:
         raise HTTPException(status_code=404, detail="Favourite item not found")
     return favourite_item_db
-
 
 
 @favouriteitem_router.put("/{favouriteitem_id}/", response_model=FavouriteItemOutSchema)
@@ -58,7 +55,6 @@ async def update_favourite_item(favourite_item_data: FavouriteItemUpdateSchema, 
     db.commit()
     db.refresh(favourite_item_db)
     return favourite_item_db
-
 
 
 @favouriteitem_router.delete("/{favouriteitem_id}/")
